@@ -10,7 +10,7 @@
                             <el-table-column prop="price" label="金额" width="70"></el-table-column>
                             <el-table-column label="操作" width="100" fixed="right">
                                 <template scope="scope">
-                                    <el-button type="text" size="small">删除</el-button>
+                                    <el-button type="text" size="small" @click="delSingleGoods(scope.row)">删除</el-button>
                                     <el-button type="text" size="small" @click="addOrderList(scope.row)">增加</el-button>
                                 </template>
                             </el-table-column>
@@ -21,8 +21,8 @@
                         </div>
                         <div class="div-btn">
                             <el-button type="warning">挂单</el-button>
-                            <el-button type="danger">删除</el-button>
-                            <el-button type="success">结账</el-button>
+                            <el-button type="danger" @click="delAllGoods">删除</el-button>
+                            <el-button type="success" @click="checkout">结账</el-button>
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="挂单">
@@ -155,10 +155,41 @@ export default {
                 var newGoods={goodsId:goods.goodsId,goodsName:goods.goodsName,price:goods.price,count:1};
                 this.tableData.push(newGoods);
             }
-
-            for(var i=0;i<this.tableData.length;i++){
+            this.getTotal();
+            
+        },
+        delSingleGoods(goods){
+            this.tableData=this.tableData.filter(o=>o.goodsId != goods.goodsId);
+            //console.log(this.tableData);
+            this.getTotal();
+        },
+        getTotal(){
+            this.totalNum=0;
+            this.totalMoney=0;
+            if(this.tableData){
+                for(var i=0;i<this.tableData.length;i++){
                 this.totalNum+=this.tableData[i].count;
                 this.totalMoney=this.totalMoney+(this.tableData[i].count*this.tableData[i].price)
+                }
+            }
+        },
+        delAllGoods(){
+            this.tableData=[];
+            this.totalNum=0;
+            this.totalMoney=0;
+        },
+        checkout(){
+            if (this.totalNum!=0) {
+                this.tableData = [];
+                this.totalNum = 0;
+                this.totalMoney = 0;
+                this.$message({
+                    message: '结账成功，欢迎下次光临',
+                    type: 'success'
+                });
+        
+            }else{
+                this.$message.error('结账失败，请下单后再结账');
             }
         }
     }
